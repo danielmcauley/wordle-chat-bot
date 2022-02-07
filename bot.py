@@ -22,7 +22,7 @@ def bot():
     user = request.values.get('From', '')
 
     if user not in user_states.keys():
-        initialize_user(user)
+        initialize_user(user, user_states)
 
     if incoming_msg in five_letter_words:
         clue = get_clue(incoming_msg, user_states[user]['answer'])
@@ -34,10 +34,10 @@ def bot():
 
         if incoming_msg == user_states[user]['answer'] :
             msg.body('\nYou won!')
-            initialize_user(user)
+            initialize_user(user, user_states)
         elif user_states[user]['tries'] == 6:
             msg.body(f"\nYou lost :( ({user_states[user]['answer']})")
-            initialize_user(user)
+            initialize_user(user, user_states)
     else:
         msg.body('Only English 5-letter words, please!')
     return str(resp)
@@ -53,7 +53,7 @@ def get_clue(guess, answer):
             clue += '⬛️'
     return clue
 
-def initialize_user(user):
+def initialize_user(user, user_states):
     answer = random.choice(answer_words)
     print(answer)
     user_states[user] = {'answer': answer, 'tries': 0}
