@@ -18,6 +18,8 @@ def bot():
     resp = MessagingResponse()
     msg = resp.message()
 
+    user_states[user] = {'answer': answer, 'tries': 0}
+
     incoming_msg = request.values.get('Body', '').upper()
     user = request.values.get('From', '')
     print(f"incoming_msg: {incoming_msg}")
@@ -62,7 +64,6 @@ def get_clue(guess, answer):
 
 def initialize_user(user, user_states):
     answer = random.choice(answer_words)
-    print(answer)
     user_states[user] = {'answer': answer, 'tries': 0}
     print(f"user_states: {user_states}")
 
