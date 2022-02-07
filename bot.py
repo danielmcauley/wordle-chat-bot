@@ -28,6 +28,8 @@ def bot():
         clue = get_clue(incoming_msg, user_states[user]['answer'])
         user_states[user]['tries'] += 1
         print(f"tries: {user_states[user]['tries']}")
+        print(f"guess: {incoming_msg}")
+        print(f"answer: {user_states[user]['answer']}")
         msg.body(clue)
 
         if incoming_msg == user_states[user]['answer'] :
