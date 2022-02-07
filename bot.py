@@ -18,7 +18,7 @@ def bot():
     resp = MessagingResponse()
     msg = resp.message()
 
-    user_states[user] = {'answer': answer, 'tries': 0}
+    print(f"user_states: {user_states}")
 
     incoming_msg = request.values.get('Body', '').upper()
     user = request.values.get('From', '')
