@@ -24,7 +24,7 @@ def bot():
     if user not in user_states.keys():
         print(f"initializing user: {user}")
         initialize_user(user, user_states)
-        pritn(f"user_states: {user_states}")
+        print(f"user_states: {user_states}")
 
     if incoming_msg in five_letter_words:
         clue = get_clue(incoming_msg, user_states[user]['answer'])
@@ -60,7 +60,7 @@ def initialize_user(user, user_states):
     print(answer)
     print(f"re-initializing user: {user}")
     user_states[user] = {'answer': answer, 'tries': 0}
-    pritn(f"user_states: {user_states}")
+    print(f"user_states: {user_states}")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=4999)
