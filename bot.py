@@ -13,7 +13,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://gznmmihldcpwar:25576f7f996
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-db.create_all()
 
 
 with open('CSW19.txt', 'r') as f:
