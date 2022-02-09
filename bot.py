@@ -1,4 +1,3 @@
-import requests
 import random
 
 from sqlalchemy import create_engine
@@ -10,7 +9,7 @@ from user import User
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://gznmmihldcpwar:25576f7f9965581417abf57b1e48cddd23ed157ffe8910c9e6a5ba9ef564dae1@ec2-67-202-63-147.compute-1.amazonaws.com:5432/d6m8dcei8eee3d'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://gznmmihldcpwar:25576f7f9965581417abf57b1e48cddd23ed157ffe8910c9e6a5ba9ef564dae1@ec2-67-202-63-147.compute-1.amazonaws.com:5432/d6m8dcei8eee3d'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
