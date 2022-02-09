@@ -10,7 +10,7 @@ from user import User
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://d17y:password@localhost/wordle'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://gznmmihldcpwar:25576f7f9965581417abf57b1e48cddd23ed157ffe8910c9e6a5ba9ef564dae1@ec2-67-202-63-147.compute-1.amazonaws.com:5432/d6m8dcei8eee3d'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -87,4 +87,4 @@ def get_clue(guess, answer):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=4999)
+    app.run(debug=True)
