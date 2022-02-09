@@ -1,11 +1,21 @@
-from flask import Flask, request
 import requests
 import random
+
+from sqlalchemy import create_engine
+from flask import Flask, request
+from flask_sqlalchemy import SQLAlchemy
 from twilio.twiml.messaging_response import MessagingResponse
 
-app = Flask(__name__)
+from user import User
 
-user_states = {}
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://d17y:password@localhost/wordle'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+db.create_all()
+
 
 with open('CSW19.txt', 'r') as f:
     five_letter_words = [w for w in f.read().split('\n') if len(w) == 5]
@@ -13,43 +23,56 @@ with open('CSW19.txt', 'r') as f:
 with open('answers.txt', 'r') as f:
     answer_words = [w.upper() for w in f.read().split('\n')]
 
+
 @app.route('/bot', methods=['POST'])
 def bot():
     resp = MessagingResponse()
     msg = resp.message()
 
-    print(f"user_states: {user_states}")
-
     incoming_msg = request.values.get('Body', '').upper()
-    user = request.values.get('From', '')
+    from_str = request.values.get('From', '')
     print(f"incoming_msg: {incoming_msg}")
-    print(f"user: {user}")
+    print(f"user: {from_str}")
 
-    if user not in user_states.keys():
-        print("user not in user_states.keys()")
-        print(f"initializing user: {user}")
-        initialize_user(user, user_states)
+    if User.query.filter_by(from_str=from_str).scalar():
+        print("user is in db")
+        print(f"retrieving user from db: {from_str}")
+        user = db.session.query(User).filter(User.from_str == from_str).first()
+        print(user)
+        print(type(user))
+    else:
+        print("user not in db")
+        print(f"initializing user: {from_str}")
+        user = User(from_str=from_str, answer=random.choice(answer_words))
+        db.session.add(user)
+        db.session.commit()
 
     if incoming_msg in five_letter_words:
-        clue = get_clue(incoming_msg, user_states[user]['answer'])
-        user_states[user]['tries'] += 1
-        print(f"tries: {user_states[user]['tries']}")
-        print(f"guess: {incoming_msg}")
-        print(f"answer: {user_states[user]['answer']}")
-        print(f"user_states: {user_states}")
+        clue = get_clue(incoming_msg, user.answer)
+        user.tries += 1
+        db.session.commit()
+        print(f"tries: { user.tries }")
+        print(f"guess: { incoming_msg }")
+        print(f"answer: { user.answer }")
+        print(f"user_states: { user }")
         msg.body(clue)
 
-        if incoming_msg == user_states[user]['answer'] :
+        if incoming_msg == user.answer:
             msg.body('\nYou won!')
-            print(f"re-initializing user: {user}")
-            initialize_user(user, user_states)
-        elif user_states[user]['tries'] == 6:
-            msg.body(f"\nYou lost :( ({user_states[user]['answer']})")
-            print(f"re-initializing user: {user}")
-            initialize_user(user, user_states)
+            print(f"deleting user: { user }")
+            db.session.delete(user)
+            db.session.commit()
+            # print(User.query.all())
+        elif user.tries == 6:
+            msg.body(f"\nYou lost :( ({ user.answer })")
+            print(f"deleting user: { user }")
+            db.session.delete(user)
+            db.session.commit()
     else:
         msg.body('Only English 5-letter words, please!')
+
     return str(resp)
+
 
 def get_clue(guess, answer):
     clue = ''
@@ -62,10 +85,6 @@ def get_clue(guess, answer):
             clue += '⬛️'
     return clue
 
-def initialize_user(user, user_states):
-    answer = random.choice(answer_words)
-    user_states[user] = {'answer': answer, 'tries': 0}
-    print(f"user_states: {user_states}")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=4999)
